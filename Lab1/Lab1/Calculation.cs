@@ -1,0 +1,333 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Lab1
+{
+    public class Calculation
+    {
+
+        private HashSet<String> setEl = new HashSet<string>(); //Множина для обрахунку унікальних елементів
+
+        private int countUEl; //Кількість унікальних елементів
+
+        public List<List<int>> resultMatrix;//Вихідна матриця подібності
+
+        private List<HashSet<int>> groups;//Групи елементів
+
+        private List<HashSet<int>> groupsAfterV;//Групи елементів після уточнення
+
+        private List<HashSet<string>> mas;//Масив елементів
+
+        ////////////1 Лаба
+        public int CountUEl
+        {
+            get { return countUEl; }
+        }
+
+        public void countUniqueEl(TextBox[][] valueEl)//Обчислення унікальних елементів (копіюю всі елементи в множину, результатом буде кількість елементів)
+        {
+            bool voidEl = false;
+            foreach (TextBox[] i in valueEl)
+            {
+                foreach (TextBox j in i)
+                {
+                    setEl.Add(j.Text);
+                    if (j.Text == "")
+                        voidEl = true;
+                }
+            }
+
+            countUEl = setEl.Count();
+            if (voidEl) countUEl--;
+        }
+
+        public void calcResultMatrix(TextBox[][] valueEl, int sizeMatrix, NumericUpDown[] numUpDnArray)//Обчислення матриці подібності
+        {
+
+
+
+            mas = new List<HashSet<string>>();//Копіюю елементи з TextBox[][] в  List
+
+            for (int i = 0; i < sizeMatrix; i++)
+            {
+                mas.Add(new HashSet<string>());
+
+                for (int j = 0; j < (int)numUpDnArray[i].Value; j++)
+                {
+                    if (valueEl[i][j].Text == "") continue;
+
+
+                    mas[i].Add(valueEl[i][j].Text);
+                }
+            }
+
+            for (int i = 0; i < mas.Count; i++)//Видалення пустих рядків
+            {
+                if (mas.ElementAt(i).Count == 0)
+                    mas.RemoveAt(i);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////
+            resultMatrix = new List<List<int>>();
+            for (int i = 0; i < mas.Count; i++)
+            {
+                resultMatrix.Add(new List<int>());
+                for (int j = 0; j < mas.Count; j++)
+                {
+                    resultMatrix[i].Add(0);
+                }
+            }
+            List<String> list; //List для злиття 2 рядків елементів
+            for (int i = 0; i < mas.Count - 1; i++)
+            {
+                list = new List<String>();
+
+                for (int j = 1; j < mas.Count; j++)
+                {
+                    if (i == j) continue;
+
+
+                    list.AddRange(mas[i]);//Копіюю 1 рядок
+                    list.AddRange(mas[j]);//Копіюю 2 рядок
+
+                    /* list.Distinct() видаляє елементи, які повторюються, залишаючи перший з них.
+                     * (list.Count - list.Distinct().Count()))*2 - дізнаюсь скільки спільних елементів
+                     * (list.Count - (list.Count - list.Distinct().Count()) * 2) - дізнаюсь скільки унікальних елементів
+                     * countUEl - (list.Count - (list.Count - list.Distinct().Count()) * 2) - від загальної кількості віднімаю унікальні в 2 рядках
+                     */
+
+
+                    resultMatrix[i][j] = countUEl - (list.Count - (list.Count - list.Distinct().Count()) * 2);
+
+                    resultMatrix[j][i] = countUEl - (list.Count - (list.Count - list.Distinct().Count()) * 2);
+
+
+                    list.Clear();//Очищаю для наступної пари рядків
+                }
+            }
+        }
+
+        public void outResultMatrix(Label l)//Виведення матриці подібності
+        {
+            for (int i = 0; i < resultMatrix.Count; i++)
+            {
+                for (int j = 0; j < resultMatrix.Count; j++)
+                {
+                    l.Text += resultMatrix[i][j] ;
+                    if (resultMatrix[i][j] < 10)
+                        l.Text += "   ";
+                    else
+                        l.Text += " ";
+                }
+                l.Text += "\n";
+            }
+        }
+        ////////////////До 2 лаби
+        public void createGroups()//Розбиття на групи
+        {
+            groups = new List<HashSet<int>>();
+            int currentGroup = 0;
+            do//Виконуємо поки всі елементи не розподілили по групам
+            {
+                int[] maxElIndex = maxEl(resultMatrix.Count, resultMatrix);
+                if (maxElIndex == null && containsAllIndex() == false)//Якщо не можемо знайти максимальний елемент, який не входить в групи, але ще залишилися елементи
+                {
+                    createLastGroup();//Елементи, що залишилися об'єднуємо в одну групу
+                    return;
+                }
+                groups.Add(new HashSet<int>());//Створюю нову групу
+                groups.ElementAt(currentGroup).Add(maxElIndex[0]);//Записую в групу індекси максимального елемента (i)
+                groups.ElementAt(currentGroup).Add(maxElIndex[1]);//(j)
+                int i = maxElIndex[0];
+                for (int j = 0; j < resultMatrix.Count; j++)//Продивляюсь по рядку(i=const)
+                {
+                    if (i == j) break;
+                    if (resultMatrix[i][j] == resultMatrix[maxElIndex[0]][maxElIndex[1]] && containedInGroups(j) == false)
+                    {
+                        groups.ElementAt(currentGroup).Add(j);
+                    }
+                }
+                int x = maxElIndex[1];
+                for (int k = maxElIndex[1] + 1; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
+                {
+                    if (resultMatrix[k][x] == resultMatrix[maxElIndex[0]][maxElIndex[1]] && containedInGroups(k) == false)
+                    {
+                        groups.ElementAt(currentGroup).Add(k);
+                    }
+                }
+                currentGroup++;
+            } while (containsAllIndex() == false); 
+
+        }
+
+        private int[] maxEl(int matrixSize, List<List<int>> resultMatrix)//Пошук максимального елемента, який ще не має групи
+        {
+            int max = -1;
+
+            int[] maxIndex = new int[2];
+            for (int i = 0; i < matrixSize; i++)
+            {
+                for (int j = 0; j < matrixSize; j++)
+                {
+                    if (i == j) break;
+
+                    if (resultMatrix[i][j] >= max && containedInGroups(i) == false && containedInGroups(j) == false)
+                    {
+                        max = resultMatrix[i][j];
+                        maxIndex[0] = i;
+                        maxIndex[1] = j;
+                    }
+                }
+            }
+            if (max == -1)//Якщо не можна знайти не зайнятого елемента
+                maxIndex = null;
+            return maxIndex;
+        }
+
+        private bool containedInGroups(int index)//Перевіряє чи заданий елемент вже міститься в групах
+        {
+            foreach (HashSet<int> i in groups)
+            {
+                if (i.Contains(index))
+                    return true;
+            }
+            return false;
+
+        }
+
+        private bool containsAllIndex()//Перевіряє чи всі елементи розбиті на групи
+        {
+            bool found = true;
+            for (int i = 0; i < resultMatrix.Count; i++)//Шукаю індекси в усіх групах
+            {
+                foreach (HashSet<int> j in groups)
+                {
+                    if (j.Contains(i) == false)
+                        found = false;
+                    else
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found == false)
+                    return false;
+            }
+            return true;
+        }
+
+        private void createLastGroup()//Створю останню групу, в яку входять елементи, що залишились незгрупованими
+        {
+            groups.Add(new HashSet<int>());
+
+            bool found = false;
+            for (int i = 0; i < resultMatrix.Count; i++)//Шукаю індекси в усіх групах
+            {
+                foreach (HashSet<int> j in groups)
+                {
+                    if (j.Contains(i) == false)
+                        found = false;
+                    else
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found == false)
+                    groups.ElementAt(groups.Count - 1).Add(i);
+            }
+        }
+
+        public void outGroups(Label l)//Виведення результату групування
+        {
+            int n = 1;
+            l.Text += "\n";
+            foreach(HashSet<int> i in groups)
+            {
+                l.Text += n +  " група {  ";
+                foreach(int j in i)
+                {
+                    l.Text += (j+1) + "  ";
+                }
+                l.Text += "}\n";
+                n++;
+            }
+        }
+        ////////////3 Лаба
+        private List<HashSet<string>> createSet(List<HashSet<int>> groups)//Зливаю елементи в одну множину за результатами групування
+        {
+            List<HashSet<string>> setElOfGroups = new List<HashSet<string>>();
+
+            for(int i = 0; i < groups.Count(); i++)
+            {
+                setElOfGroups.Add(new HashSet<string>());
+                for(int j = 0; j < groups[i].Count(); j++)
+                {
+                    for (int k = 0; k < mas[groups[i].ElementAt(j)].Count; k++)
+                    {
+                        setElOfGroups[i].Add(mas[groups[i].ElementAt(j)].ElementAt(k));
+                    }
+                }
+            }
+
+            setElOfGroups.Sort((a, b) => b.Count - a.Count);//Сортую за кількістю елементів (DESC)
+
+            return setElOfGroups;
+        }
+
+        public void groupsAfterVerification()//Групування з знаходженням підмножин
+        {
+           
+
+            groupsAfterV = new List<HashSet<int>>();
+            List<HashSet<string>> setElAfterV= new List<HashSet<string>>();
+
+            groupsAfterV.AddRange(groups);
+            setElAfterV.AddRange(createSet(groups));
+
+            for (int i = 0; i < setElAfterV.Count() - 1; i++)//Йду по найбільших групах
+            {
+                for (int k = i+1; k < groupsAfterV.Count(); k++)//Йду по підгрупах
+                {
+                    for (int j = 0; j < groupsAfterV[k].Count; j++)//Йду по елементах в групі
+                    {
+                        if (setElAfterV[i].IsSupersetOf(mas[groupsAfterV[k].ElementAt(j)]))//Являється підмножиною?
+                        {
+                            groupsAfterV[i].Add(groupsAfterV[k].ElementAt(j));//Додаю елемент групи в групу надмножину
+                            groupsAfterV[k].Remove(groupsAfterV[k].ElementAt(j));//Видаляю елемент з підмножини
+                            j--;
+                        }
+                    }
+                }
+                for (int ind = 0; ind < groupsAfterV.Count; ind++)//Видалення пустих рядків
+                {
+                    if (groupsAfterV.ElementAt(ind).Count == 0)
+                        groupsAfterV.RemoveAt(ind);
+                }
+
+                setElAfterV.Clear();//Видалив всі групи
+                setElAfterV.AddRange(createSet(groupsAfterV));//Переукомплектовую групи після уточнення
+            }
+        }
+
+        public void outgroupsAfterVerification(Label l)//Виведення уточнених груп
+        {
+            int n = 1;
+            l.Text += "\n";
+            foreach (HashSet<int> i in groupsAfterV)
+            {
+                l.Text += n + " група {  ";
+                foreach (int j in i)
+                {
+                    l.Text += (j + 1) + "  ";
+                }
+                l.Text += "}\n";
+                n++;
+            }
+        }
+    }
+}
