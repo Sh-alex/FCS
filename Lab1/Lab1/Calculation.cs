@@ -274,7 +274,10 @@ namespace Lab1
                 }
             }
 
-            setElOfGroups.Sort((a, b) => b.Count - a.Count);//Сортую за кількістю елементів (DESC)
+            
+
+            //setElOfGroups.Sort((a, b) => b.Count - a.Count);//Сортую за кількістю елементів (DESC)
+
 
             return setElOfGroups;
         }
@@ -287,7 +290,35 @@ namespace Lab1
             List<HashSet<string>> setElAfterV= new List<HashSet<string>>();
 
             groupsAfterV.AddRange(groups);
+            
             setElAfterV.AddRange(createSet(groups));
+
+            ////////////////////////////// Сортую групи і множини елементів за кількістю елементів(разом щоб співпадали)
+            List<HashSet<int>> temp = new List<HashSet<int>>();
+            List<HashSet<string>> temp2 = new List<HashSet<string>>();
+            for (int i = 0; i < groupsAfterV.Count; i++)
+            {
+                for (int j = 0; j < groupsAfterV.Count - 1; j++)
+                {
+                    if (setElAfterV.ElementAt(j).Count < setElAfterV.ElementAt(j + 1).Count)
+                    {
+                        temp.Add(groupsAfterV.ElementAt(j));
+                        groupsAfterV.Insert(j, groupsAfterV.ElementAt(j + 1));
+                        groupsAfterV.RemoveAt(j + 1);
+                        groupsAfterV.Insert(j + 1, temp.ElementAt(0));
+                        groupsAfterV.RemoveAt(j + 2);
+                        temp.Clear();
+
+                        temp2.Add(setElAfterV.ElementAt(j));
+                        setElAfterV.Insert(j, setElAfterV.ElementAt(j + 1));
+                        setElAfterV.RemoveAt(j + 1);
+                        setElAfterV.Insert(j + 1, temp2.ElementAt(0));
+                        setElAfterV.RemoveAt(j + 2);
+                        temp2.Clear();
+                    }
+                }
+            }
+            /////////////////////////////
 
             for (int i = 0; i < setElAfterV.Count() - 1; i++)//Йду по найбільших групах
             {
