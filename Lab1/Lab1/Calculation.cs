@@ -284,8 +284,6 @@ namespace Lab1
 
         public void groupsAfterVerification()//Групування з знаходженням підмножин
         {
-           
-
             groupsAfterV = new List<HashSet<int>>();
             List<HashSet<string>> setElAfterV= new List<HashSet<string>>();
 
@@ -293,32 +291,7 @@ namespace Lab1
             
             setElAfterV.AddRange(createSet(groups));
 
-            ////////////////////////////// Сортую групи і множини елементів за кількістю елементів(разом щоб співпадали)
-            List<HashSet<int>> temp = new List<HashSet<int>>();
-            List<HashSet<string>> temp2 = new List<HashSet<string>>();
-            for (int i = 0; i < groupsAfterV.Count; i++)
-            {
-                for (int j = 0; j < groupsAfterV.Count - 1; j++)
-                {
-                    if (setElAfterV.ElementAt(j).Count < setElAfterV.ElementAt(j + 1).Count)
-                    {
-                        temp.Add(groupsAfterV.ElementAt(j));
-                        groupsAfterV.Insert(j, groupsAfterV.ElementAt(j + 1));
-                        groupsAfterV.RemoveAt(j + 1);
-                        groupsAfterV.Insert(j + 1, temp.ElementAt(0));
-                        groupsAfterV.RemoveAt(j + 2);
-                        temp.Clear();
-
-                        temp2.Add(setElAfterV.ElementAt(j));
-                        setElAfterV.Insert(j, setElAfterV.ElementAt(j + 1));
-                        setElAfterV.RemoveAt(j + 1);
-                        setElAfterV.Insert(j + 1, temp2.ElementAt(0));
-                        setElAfterV.RemoveAt(j + 2);
-                        temp2.Clear();
-                    }
-                }
-            }
-            /////////////////////////////
+            sortV(groupsAfterV, setElAfterV);
 
             for (int i = 0; i < setElAfterV.Count() - 1; i++)//Йду по найбільших групах
             {
@@ -358,6 +331,34 @@ namespace Lab1
                 }
                 l.Text += "}\n";
                 n++;
+            }
+        }
+
+        private void sortV(List<HashSet<int>> groupsAfterV, List<HashSet<string>> setElAfterV)//Сортую групи і множини елементів за кількістю елементів(разом щоб співпадали)
+        {
+            List<HashSet<int>> temp = new List<HashSet<int>>();
+            List<HashSet<string>> temp2 = new List<HashSet<string>>();
+            for (int i = 0; i < groupsAfterV.Count; i++)
+            {
+                for (int j = 0; j < groupsAfterV.Count - 1; j++)
+                {
+                    if (setElAfterV.ElementAt(j).Count < setElAfterV.ElementAt(j + 1).Count)
+                    {
+                        temp.Add(groupsAfterV.ElementAt(j));
+                        groupsAfterV.Insert(j, groupsAfterV.ElementAt(j + 1));
+                        groupsAfterV.RemoveAt(j + 1);
+                        groupsAfterV.Insert(j + 1, temp.ElementAt(0));
+                        groupsAfterV.RemoveAt(j + 2);
+                        temp.Clear();
+
+                        temp2.Add(setElAfterV.ElementAt(j));
+                        setElAfterV.Insert(j, setElAfterV.ElementAt(j + 1));
+                        setElAfterV.RemoveAt(j + 1);
+                        setElAfterV.Insert(j + 1, temp2.ElementAt(0));
+                        setElAfterV.RemoveAt(j + 2);
+                        temp2.Clear();
+                    }
+                }
             }
         }
     }
