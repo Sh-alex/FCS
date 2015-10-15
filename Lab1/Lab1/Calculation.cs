@@ -291,7 +291,9 @@ namespace Lab1
             
             setElAfterV.AddRange(createSet(groups));
 
-            sortV(groupsAfterV, setElAfterV);
+            sortV(groupsAfterV, setElAfterV);//Сортування груп за кількістю елементів
+
+            sortWithEqualL(setElAfterV);//Сортування груп з однаковою кількістю елементів за перекриванням найбільшої кількості об'єктів
 
             for (int i = 0; i < setElAfterV.Count() - 1; i++)//Йду по найбільших групах
             {
@@ -315,6 +317,7 @@ namespace Lab1
 
                 setElAfterV.Clear();//Видалив всі групи
                 setElAfterV.AddRange(createSet(groupsAfterV));//Переукомплектовую групи після уточнення
+                sortWithEqualL(setElAfterV);//Сортування груп з однаковою кількістю елементів за перекриванням найбільшої кількості об'єктів
             }
         }
 
@@ -357,6 +360,64 @@ namespace Lab1
                         setElAfterV.Insert(j + 1, temp2.ElementAt(0));
                         setElAfterV.RemoveAt(j + 2);
                         temp2.Clear();
+                    }
+                }
+            }
+        }
+
+        private void sortWithEqualL(List<HashSet<string>> setElAfterV)//Сортування груп з однаковою кількістю елементів за перекриванням найбільшої кількості об'єктів
+        {
+            List<HashSet<string>> tempSet = new List<HashSet<string>>();
+            tempSet.Add(setElAfterV[0]);
+            for (int i = 0; i < setElAfterV.Count-1; i++ )
+            {
+                if (setElAfterV[i].Count == setElAfterV[i + 1].Count)
+                {
+                    tempSet.Add(setElAfterV[i + 1]);
+                }
+                else
+                    break;
+            }
+            if(tempSet.Count > 1)
+            {
+                List<int> numberOverlapped = new List<int>();//Кількість перекритих об'єктів
+
+                for (int i = 0; i < tempSet.Count(); i++)//Знаходжу скільки об'єктів перекриває кожна група
+                {
+                    numberOverlapped.Add(0);//Початкова кількість перекритих об'єктів
+                    for (int k = 0; k < tempSet.Count(); k++)
+                    {
+                        if (i == k) continue;
+                        for (int j = 0; j < groupsAfterV[k].Count; j++)
+                        {
+                            if (tempSet[i].IsSupersetOf(mas[groupsAfterV[k].ElementAt(j)]))//Являється підмножиною?
+                            {
+                                numberOverlapped[i]++;
+                            }
+                        }
+                    }
+                }
+
+                for(int i = 0; i < tempSet.Count; i++)
+                {
+                    for (int j = i+1; j < tempSet.Count; j++)
+                    {
+                        if(numberOverlapped[i] < numberOverlapped[j])
+                        {
+                            int temp = numberOverlapped[i];
+                            numberOverlapped[i] = numberOverlapped[j];
+                            numberOverlapped[j] = temp;
+
+                            List<HashSet<int>> tempGroup = new List<HashSet<int>>();
+                            tempGroup.Add(groupsAfterV[i]);
+                            groupsAfterV[i] = groupsAfterV[j];
+                            groupsAfterV[j] = tempGroup[0];
+
+                            List<HashSet<string>> tempEl = new List<HashSet<string>>();
+                            tempEl.Add(setElAfterV[i]);
+                            setElAfterV[i] = setElAfterV[j];
+                            setElAfterV[j] = tempEl[0];
+                        }
                     }
                 }
             }
