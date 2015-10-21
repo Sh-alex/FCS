@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GraphX;
 
 namespace Lab1
 {
     public class Calculation
     {
+        private List<HashSet<string>> mas;//Масив елементів
 
         private HashSet<String> setEl = new HashSet<string>(); //Множина для обрахунку унікальних елементів
 
@@ -21,7 +23,7 @@ namespace Lab1
 
         private List<HashSet<int>> groupsAfterV;//Групи елементів після уточнення
 
-        private List<HashSet<string>> mas;//Масив елементів
+        public List<HashSet<string>> setElAfterV;//Множини елементів групи
 
         ////////////1 Лаба
         public int CountUEl
@@ -152,7 +154,7 @@ namespace Lab1
                     }
                 }
                 int x = maxElIndex[1];
-                for (int k = maxElIndex[1] + 1; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
+                for (int k = 0; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
                 {
                     if (resultMatrix[k][x] == resultMatrix[maxElIndex[0]][maxElIndex[1]] && containedInGroups(k) == false)
                     {
@@ -173,9 +175,9 @@ namespace Lab1
             {
                 for (int j = 0; j < matrixSize; j++)
                 {
-                    if (i == j) break;
+                    if (i == j) continue;
 
-                    if (resultMatrix[i][j] >= max && containedInGroups(i) == false && containedInGroups(j) == false)
+                    if (resultMatrix[i][j] > max && containedInGroups(i) == false && containedInGroups(j) == false)
                     {
                         max = resultMatrix[i][j];
                         maxIndex[0] = i;
@@ -285,7 +287,7 @@ namespace Lab1
         public void groupsAfterVerification()//Групування з знаходженням підмножин
         {
             groupsAfterV = new List<HashSet<int>>();
-            List<HashSet<string>> setElAfterV= new List<HashSet<string>>();
+            setElAfterV= new List<HashSet<string>>();
 
             groupsAfterV.AddRange(groups);
             
@@ -421,6 +423,6 @@ namespace Lab1
                     }
                 }
             }
-        }
+        }       
     }
 }
