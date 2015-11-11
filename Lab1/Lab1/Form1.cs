@@ -122,7 +122,12 @@ namespace Lab1
 
                 Form2 Form2 = new Form2(calc);
                 Form2.Show();
+
+                GraphVisual GraphVisual = new GraphVisual(calc);
+                GraphVisual.Show();
             }
+
+           
         }
 
         void ctr_ValueChanged(object sender, EventArgs e)//Подія при зміні довжини рядка
