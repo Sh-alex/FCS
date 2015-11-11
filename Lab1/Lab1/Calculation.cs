@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GraphX;
 
 namespace Lab1
 {
     public class Calculation
     {
+        private List<HashSet<string>> mas;//Масив елементів
 
         private HashSet<String> setEl = new HashSet<string>(); //Множина для обрахунку унікальних елементів
 
@@ -21,7 +23,7 @@ namespace Lab1
 
         private List<HashSet<int>> groupsAfterV;//Групи елементів після уточнення
 
-        private List<HashSet<string>> mas;//Масив елементів
+        public List<HashSet<string>> setElAfterV;//Множини елементів групи
 
         ////////////1 Лаба
         public int CountUEl
@@ -152,7 +154,7 @@ namespace Lab1
                     }
                 }
                 int x = maxElIndex[1];
-                for (int k = maxElIndex[1] + 1; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
+                for (int k = 0; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
                 {
                     if (resultMatrix[k][x] == resultMatrix[maxElIndex[0]][maxElIndex[1]] && containedInGroups(k) == false)
                     {
@@ -173,9 +175,9 @@ namespace Lab1
             {
                 for (int j = 0; j < matrixSize; j++)
                 {
-                    if (i == j) break;
+                    if (i == j) continue;
 
-                    if (resultMatrix[i][j] >= max && containedInGroups(i) == false && containedInGroups(j) == false)
+                    if (resultMatrix[i][j] > max && containedInGroups(i) == false && containedInGroups(j) == false)
                     {
                         max = resultMatrix[i][j];
                         maxIndex[0] = i;
@@ -285,13 +287,15 @@ namespace Lab1
         public void groupsAfterVerification()//Групування з знаходженням підмножин
         {
             groupsAfterV = new List<HashSet<int>>();
-            List<HashSet<string>> setElAfterV= new List<HashSet<string>>();
+            setElAfterV= new List<HashSet<string>>();
 
             groupsAfterV.AddRange(groups);
             
             setElAfterV.AddRange(createSet(groups));
 
-            sortV(groupsAfterV, setElAfterV);
+            sortV(groupsAfterV, setElAfterV);//Сортування груп за кількістю елементів
+
+            sortWithEqualL(setElAfterV);//Сортування груп з однаковою кількістю елементів за перекриванням найбільшої кількості об'єктів
 
             for (int i = 0; i < setElAfterV.Count() - 1; i++)//Йду по найбільших групах
             {
@@ -315,6 +319,7 @@ namespace Lab1
 
                 setElAfterV.Clear();//Видалив всі групи
                 setElAfterV.AddRange(createSet(groupsAfterV));//Переукомплектовую групи після уточнення
+                sortWithEqualL(setElAfterV);//Сортування груп з однаковою кількістю елементів за перекриванням найбільшої кількості об'єктів
             }
         }
 
@@ -361,5 +366,63 @@ namespace Lab1
                 }
             }
         }
+
+        private void sortWithEqualL(List<HashSet<string>> setElAfterV)//Сортування груп з однаковою кількістю елементів за перекриванням найбільшої кількості об'єктів
+        {
+            List<HashSet<string>> tempSet = new List<HashSet<string>>();
+            tempSet.Add(setElAfterV[0]);
+            for (int i = 0; i < setElAfterV.Count-1; i++ )
+            {
+                if (setElAfterV[i].Count == setElAfterV[i + 1].Count)
+                {
+                    tempSet.Add(setElAfterV[i + 1]);
+                }
+                else
+                    break;
+            }
+            if(tempSet.Count > 1)
+            {
+                List<int> numberOverlapped = new List<int>();//Кількість перекритих об'єктів
+
+                for (int i = 0; i < tempSet.Count(); i++)//Знаходжу скільки об'єктів перекриває кожна група
+                {
+                    numberOverlapped.Add(0);//Початкова кількість перекритих об'єктів
+                    for (int k = 0; k < tempSet.Count(); k++)
+                    {
+                        if (i == k) continue;
+                        for (int j = 0; j < groupsAfterV[k].Count; j++)
+                        {
+                            if (tempSet[i].IsSupersetOf(mas[groupsAfterV[k].ElementAt(j)]))//Являється підмножиною?
+                            {
+                                numberOverlapped[i]++;
+                            }
+                        }
+                    }
+                }
+
+                for(int i = 0; i < tempSet.Count; i++)
+                {
+                    for (int j = i+1; j < tempSet.Count; j++)
+                    {
+                        if(numberOverlapped[i] < numberOverlapped[j])
+                        {
+                            int temp = numberOverlapped[i];
+                            numberOverlapped[i] = numberOverlapped[j];
+                            numberOverlapped[j] = temp;
+
+                            List<HashSet<int>> tempGroup = new List<HashSet<int>>();
+                            tempGroup.Add(groupsAfterV[i]);
+                            groupsAfterV[i] = groupsAfterV[j];
+                            groupsAfterV[j] = tempGroup[0];
+
+                            List<HashSet<string>> tempEl = new List<HashSet<string>>();
+                            tempEl.Add(setElAfterV[i]);
+                            setElAfterV[i] = setElAfterV[j];
+                            setElAfterV[j] = tempEl[0];
+                        }
+                    }
+                }
+            }
+        }       
     }
 }
