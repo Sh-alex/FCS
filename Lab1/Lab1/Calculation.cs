@@ -11,7 +11,11 @@ namespace Lab1
 {
     public class Calculation
     {
-        private List<HashSet<string>> mas;//Масив елементів
+
+        
+
+        public List<HashSet<string>> mas;//Масив елементів
+
 
         private HashSet<String> setEl = new HashSet<string>(); //Множина для обрахунку унікальних елементів
 
@@ -21,9 +25,15 @@ namespace Lab1
 
         private List<HashSet<int>> groups;//Групи елементів
 
-        private List<HashSet<int>> groupsAfterV;//Групи елементів після уточнення
+        public List<HashSet<int>> groupsAfterV;//Групи елементів після уточнення
 
         public List<HashSet<string>> setElAfterV;//Множини елементів групи
+
+
+        public Dictionary<int, List<List<string>>> moduls = new Dictionary<int,List<List<string>>>();//Словник модулів для кожної крупи
+
+        public List<List<string>> modulsAfterVerification = new List<List<string>>();//Уточнені модулі
+
 
         ////////////1 Лаба
         public int CountUEl
@@ -424,5 +434,8 @@ namespace Lab1
                 }
             }
         }       
+
+        ////////////////4 і 5 лаби в GraphVisualizer
+
     }
 }
