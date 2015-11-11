@@ -123,8 +123,8 @@ namespace Lab1
                 Form2 Form2 = new Form2(calc);
                 Form2.Show();
 
-                GraphVisualizer GraphVisualizer = new GraphVisualizer(calc);
-                GraphVisualizer.Show();
+                GraphVisual GraphVisual = new GraphVisual(calc);
+                GraphVisual.Show();
             }
 
            

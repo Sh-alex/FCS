@@ -101,11 +101,11 @@
     </Compile>
     <Compile Include="Graph.cs" />
     <Compile Include="GraphArea.cs" />
-    <Compile Include="GraphVisualizer.cs">
+    <Compile Include="GraphVisual.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GraphVisualizer.Designer.cs">
-      <DependentUpon>GraphVisualizer.cs</DependentUpon>
+    <Compile Include="GraphVisual.Designer.cs">
+      <DependentUpon>GraphVisual.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -115,8 +115,8 @@
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GraphVisualizer.resx">
-      <DependentUpon>GraphVisualizer.cs</DependentUpon>
+    <EmbeddedResource Include="GraphVisual.resx">
+      <DependentUpon>GraphVisual.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
