@@ -18,13 +18,17 @@ namespace Lab1
 {
     public partial class GraphVisualizer : Form
     {
+<<<<<<< HEAD
         ///////////4 Лаба
+=======
+>>>>>>> 773e8ee120b1945ba27192e6e72cbb067999b6f5
         public GraphVisualizer(Calculation calc)
         {
             InitializeComponent();
             this.calc = calc;
         }
 
+<<<<<<< HEAD
         private ZoomControl _zoomctrl;
         private GraphArea _gArea;
 
@@ -46,6 +50,19 @@ namespace Lab1
             _zoomctrl.ZoomToFill();
         }
 
+=======
+        Calculation calc;
+
+        private void GraphVisualizer_Load(object sender, EventArgs e)
+        {
+            wpfHost.Child = GenerateWpfVisuals();
+            _zoomctrl.ZoomToFill();
+        }
+
+        private ZoomControl _zoomctrl;
+        private GraphArea _gArea;
+
+>>>>>>> 773e8ee120b1945ba27192e6e72cbb067999b6f5
         private UIElement GenerateWpfVisuals()
         {
             _zoomctrl = new ZoomControl();
@@ -53,7 +70,11 @@ namespace Lab1
             /* ENABLES WINFORMS HOSTING MODE --- >*/
             var logic = new GXLogicCore<DataVertex, DataEdge, BidirectionalGraph<DataVertex, DataEdge>>();
             _gArea = new GraphArea() { EnableWinFormsHostingMode = true, LogicCore = logic };
+<<<<<<< HEAD
             logic.Graph = totalGraph;
+=======
+            logic.Graph = GenerateGraph();
+>>>>>>> 773e8ee120b1945ba27192e6e72cbb067999b6f5
             logic.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.LinLog;
             logic.DefaultLayoutAlgorithmParams = logic.AlgorithmFactory.CreateLayoutParameters(LayoutAlgorithmTypeEnum.LinLog);
             //((LinLogLayoutParameters)logic.DefaultLayoutAlgorithmParams). = 100;
@@ -73,6 +94,7 @@ namespace Lab1
             return _zoomctrl;
         }
 
+<<<<<<< HEAD
         private Graph GenerateGraph()//Створює графи на основі уточнених груп
         {
             graphs = new List<Graph>();//Лист графів для кожної групи
@@ -490,6 +512,58 @@ namespace Lab1
         {
             GenerateGraph();
             wpfHost.Child = GenerateWpfVisuals();
+=======
+        void gArea_RelayoutFinished(object sender, EventArgs e)
+        {
+            _zoomctrl.ZoomToFill();
+        }
+
+        private Graph GenerateGraph()
+        {
+           
+            var dataGraph = new Graph();
+
+            HashSet<string> tempSet = new HashSet<string>();
+            
+            foreach(HashSet<string> i in calc.setElAfterV)//Формування вершин
+            {
+                foreach (string j in i)
+                {
+                    tempSet.Add(j);
+                }
+            }
+
+            foreach(string st in tempSet)
+            {
+                var dataVertex = new DataVertex(st);
+                dataGraph.AddVertex(dataVertex);
+            }
+
+            var list = dataGraph.Vertices.ToList();
+
+            for (int i = 0; i < calc.setElAfterV.Count; i++)//Утворення зв'язків
+            {
+                for (int j = 0; j < calc.setElAfterV[i].Count-1; j++)
+                {
+                    var dataVertex1 = new DataVertex(calc.setElAfterV[i].ElementAt(j));
+                    
+                    var dataVertex2 = new DataVertex(calc.setElAfterV[i].ElementAt(j+1));
+
+                    var vlist = dataGraph.Vertices.ToList();
+
+                    var dataEdge = new DataEdge(vlist.Find(x => x.Text == dataVertex1.Text), vlist.Find(x => x.Text == dataVertex2.Text)) 
+                    { Text = string.Format("{0} -> {1}", vlist.Find(x => x.Text == dataVertex1.Text), vlist.Find(x => x.Text == dataVertex2.Text)) };
+
+                    dataGraph.AddEdge(dataEdge);
+                }
+            }
+            
+            return dataGraph;
+        }
+
+        private void Generate_Click(object sender, EventArgs e)
+        {
+>>>>>>> 773e8ee120b1945ba27192e6e72cbb067999b6f5
             _gArea.GenerateGraph(true);
             _gArea.SetVerticesDrag(true, true);
             _zoomctrl.ZoomToFill();
@@ -499,6 +573,7 @@ namespace Lab1
         {
             _gArea.RelayoutGraph();
         }
+<<<<<<< HEAD
         private void createM_Click(object sender, EventArgs e)
         {
             calc.moduls.Clear();
@@ -677,5 +752,7 @@ namespace Lab1
                 }
             
         }
+=======
+>>>>>>> 773e8ee120b1945ba27192e6e72cbb067999b6f5
     }
 }

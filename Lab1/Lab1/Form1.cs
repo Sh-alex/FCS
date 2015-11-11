@@ -126,6 +126,9 @@ namespace Lab1
                 GraphVisualizer GraphVisualizer = new GraphVisualizer(calc);
                 GraphVisualizer.Show();
             }
+
+            GraphVisualizer GraphVisualizer = new GraphVisualizer(calc);
+            GraphVisualizer.Show();
         }
 
         void ctr_ValueChanged(object sender, EventArgs e)//Подія при зміні довжини рядка
