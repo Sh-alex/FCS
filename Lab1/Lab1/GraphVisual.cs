@@ -13,6 +13,7 @@ using GraphX.PCL.Logic.Algorithms.OverlapRemoval;
 using GraphX.PCL.Logic.Models;
 using GraphX.Controls;
 using QuickGraph;
+using Combinatorics.Collections;
 
 namespace Lab1
 {
@@ -33,7 +34,7 @@ namespace Lab1
         private Graph totalGraph;//Загальний граф для відображення
         private List<List<DataVertex>> catalogCycles = new List<List<DataVertex>>();//Зберігає всі знайдуні цикли(для 4 і 5 умови)
         private List<Dictionary<string, List<string>>> nameVertexAndModuls = new List<Dictionary<string, List<string>>>();//Зберігає ім'я вершини(key) і відповідні їй модулі(value)
-
+        private Dictionary<string, List<string>> nameVertexAndM;////Зберігає ім'я вершини(key) і відповідні їй модулі(value) (для всіх модулів разом)
         private List<Graph> allGraphs = new List<Graph>();//Лист для зберігання проміжних графів(щоб можна було переглядати покроково)
         private int currentGraph;//Номер проміжного графа в allGraphs, який відображається
         
@@ -58,7 +59,7 @@ namespace Lab1
             logic.Graph = totalGraph;
 
             logic.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.LinLog;
-            logic.DefaultLayoutAlgorithmParams = logic.AlgorithmFactory.CreateLayoutParameters(LayoutAlgorithmTypeEnum.LinLog);
+            logic.DefaultLayoutAlgorithmParams = logic.AlgorithmFactory.CreateLayoutParameters(LayoutAlgorithmTypeEnum.Tree);
             //((LinLogLayoutParameters)logic.DefaultLayoutAlgorithmParams). = 100;
             logic.DefaultOverlapRemovalAlgorithm = OverlapRemovalAlgorithmTypeEnum.FSA;
             logic.DefaultOverlapRemovalAlgorithmParams = logic.AlgorithmFactory.CreateOverlapRemovalParameters(OverlapRemovalAlgorithmTypeEnum.FSA);
@@ -206,7 +207,7 @@ namespace Lab1
             //////////////////////////////
             allGraphs.Add(totalGraph);
             _gArea.GenerateGraph(true, true);//Перемальовую граф
-            //_gArea.RelayoutGraph();
+            
             currentGraph = allGraphs.Count - 1;//Поточний проміжний граф(повністю згорнутий)
         }
         private void createStepGraph(int i)//Записує проміжний граф(для покрокового перегляду)
@@ -559,6 +560,7 @@ namespace Lab1
             createModuls();
 
             outModuls();
+            _gArea.RelayoutGraph();
         }
        
         private void backG_Click(object sender, EventArgs e)
@@ -611,7 +613,7 @@ namespace Lab1
         {
             totalGraph = allGraphs.Last();
             //Зливаю назви вершин і модулі в один словник
-            Dictionary<string, List<string>> nameVertexAndM = new Dictionary<string, List<string>>();
+            nameVertexAndM = new Dictionary<string, List<string>>();
 
 
             for (int i = 0; i < nameVertexAndModuls.Count; i++)
@@ -690,7 +692,10 @@ namespace Lab1
                             if (calc.modulsAfterVerification[k].Count >= calc.modulsAfterVerification[i].Count)
                                 calc.modulsAfterVerification[k].Remove(calc.modulsAfterVerification[i][j]);
                             else
+                            {
                                 calc.modulsAfterVerification[i].Remove(calc.modulsAfterVerification[i][j]);
+                                j--;
+                            }
                             ///////////////////
                             if (calc.modulsAfterVerification[i].Count == 0) calc.modulsAfterVerification.RemoveAt(i);
                             //////
@@ -704,7 +709,28 @@ namespace Lab1
                     }
                 }
             }
-            totalGraph.RemoveEdgeIf(x => x.Text != "");
+             //Перезаписую назви вершин і відповідні їм модулі
+            nameVertexAndM.Clear();
+
+            foreach(List<string> list in calc.modulsAfterVerification)
+            {
+                string key = ""; 
+                foreach(string name in list)
+                   {
+                       key += name;
+                   }
+                nameVertexAndM.Add(key, list);
+            }
+            /////////////////////////////////////////////
+            totalGraph.RemoveEdgeIf(x => x.Text != "");//Видаляю всі зв'язки
+            //Розтавляю нові вершини
+            totalGraph.RemoveVertexIf(x => x.Text != "");
+
+            foreach(string name in nameVertexAndM.Keys)
+            {
+                totalGraph.AddVertex(new DataVertex(name));
+            }
+            
         }
 
         private void modulsV_Click(object sender, EventArgs e)
@@ -714,6 +740,7 @@ namespace Lab1
             createVerificationModuls();
             outVModuls();
             _gArea.GenerateGraph(true, true);//Перемальовую граф
+            _gArea.RelayoutGraph();
         }
         
         private void outVModuls()
@@ -734,6 +761,220 @@ namespace Lab1
 
             }
         }  
+        ////////////6 Лаба
+        private List<List<string>> findFirstAndLast()
+        {
+           
+            List<string> listEl = new List<string>();
+            for (int i = 0; i < calc.mas.Count; i++ )//Записую перші елементи кожного модуля
+            {
+                listEl.Add(calc.mas[i].First());
+            }
+
+            string elementFirst = listEl[0];//Елемент, який найчастіше є першим
+            
+            int elCount = 0;
+            foreach(string el in listEl)
+            {
+
+                if (listEl.FindAll(x => x == el).Count > elCount)
+                {
+                    elCount = listEl.FindAll(x => x == el).Count;
+                    elementFirst = el;
+                }
+            }
+            /////////////////////////////////////////
+            listEl.Clear();
+            for (int i = 0; i < calc.mas.Count; i++ )//Записую останні елементи кожного модуля
+            {
+                listEl.Add(calc.mas[i].Last());
+            }
+            string elementLast = listEl[0];//Елемент, який найчастіше є останнім
+
+            elCount = 0;
+            foreach (string el in listEl)
+            {
+
+                if (listEl.FindAll(x => x == el).Count > elCount)
+                {
+                    elCount = listEl.FindAll(x => x == el).Count;
+                    elementLast = el;
+                }
+            }
+           /////////////////////
+            
+            List<string> first = calc.modulsAfterVerification.Find(x => x.Contains(elementFirst));
+            List<string> last = calc.modulsAfterVerification.Find(x => x.Contains(elementLast));
+
+            List<List<string>> result = new List<List<string>>();
+            result.Add(first);
+            result.Add(last);
+
+            return result;
+        }
+        private void genEdges(List<string> first, List<string> last)
+        {
+            ///////Поставлю модулі на відповідні місця 
+            List<List<string>> firstOrder = new List<List<string>>();
+            firstOrder.Add(first);
+            firstOrder.Add(last);
+
+            foreach (List<string> list in calc.modulsAfterVerification)
+            {
+                if (list != first && list != last)
+                    firstOrder.Insert(1, list);
+            }
+            //Проставляю зв'язки
+            createEdgesAndFindMinFeedBack(firstOrder);
+            //Виводжу результати створення зв'язків і уточнені модулі з першою та останньою групою
+            outVModulsFrom(firstOrder);
+            _gArea.GenerateGraph(true, true);//Перемальовую граф
+        }
+        private void outVModulsFrom(List<List<string>> source)
+        {
+            textBox2.Text = "Уточнені модулі:\n";
+            int n = 1;
+            textBox2.Text += "\r\n";
+
+            foreach (List<string> list in source)
+            {
+                textBox2.Text += n + " модуль {  ";
+                foreach (string j in list)
+                {
+                    textBox2.Text += j + "  ";
+                }
+                textBox2.Text += "}\r\n";
+                n++;
+
+            }
+        }  
+        private int createEdgesAndFindMinFeedBack(List<List<string>> list)
+        {
+            int feedback = 0;
+            ///////////
+            totalGraph.RemoveEdgeIf(x => x.Text != "");
+            totalGraph.RemoveVertexIf(x => x.Text != "");
+
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                string str = "";
+                foreach (string name in list[i])
+                {
+                    str += name;
+                }
+                totalGraph.AddVertex(new DataVertex(str));
+            }
+            ///////////
+            foreach(HashSet<string> row in calc.mas)
+            {
+                for (int i = 0; i < row.Count-1; i++)
+                {
+                    string nameV1 = nameVertexAndM.First(x => x.Value.Contains(row.ElementAt(i))).Key;
+                    string nameV2 = nameVertexAndM.First(x => x.Value.Contains(row.ElementAt(i+1))).Key;
+
+                    int indexV1 = list.FindIndex(x => x.Contains(row.ElementAt(i)));
+                    int indexV2 = list.FindIndex(x => x.Contains(row.ElementAt(i + 1)));
+                    if(nameV1 != nameV2)
+                    {
+                        var Edge = new DataEdge(totalGraph.Vertices.First(x => x.Text == nameV1), totalGraph.Vertices.First(x => x.Text == nameV2)) 
+                        { Text = string.Format("{0} -> {1}", totalGraph.Vertices.First(x => x.Text == nameV1), totalGraph.Vertices.First(x => x.Text == nameV2)) };
+
+                        //Перевіряю чи є вже таке ребро
+                        DataEdge temp = new DataEdge();
+                        if (totalGraph.TryGetEdge(Edge.Source, Edge.Target, out temp) == false)
+                        {
+                            totalGraph.AddEdge(Edge);
+                            if (indexV1 > indexV2)
+                            {
+                                feedback++;
+                            }
+                        }
+                    }
+                }
+            }
+            return feedback;
+        }
+
+        private void relationsWithM_Click(object sender, EventArgs e)
+        {
+            if (calc.modulsAfterVerification.Count != 0)
+            {
+                findFirstAndLast();
+                genEdges(findFirstAndLast()[0], findFirstAndLast()[1]);
+                _gArea.RelayoutGraph();
+            }
+        }
+        ///////////////////////////////////////////////
+        private void verificationRelations_Click(object sender, EventArgs e)
+        {
+            if (calc.modulsAfterVerification.Count != 0)
+            {
+                relationsWithM_Click(sender, e);
+
+                List<List<string>> temp = new List<List<string>>();
+                temp.AddRange(calc.modulsAfterVerification);
+                temp.Remove(findFirstAndLast()[0]);
+                temp.Remove(findFirstAndLast()[1]);
+
+                //Всі перестановки
+                var permutationsP = new Variations<List<string>>(temp, temp.Count);//Всі перестановки
+
+
+                int feedback = 1000;
+                List<List<string>> permutatiOptimal = new List<List<string>>();
+                List<List<string>> permutation = new List<List<string>>();
+
+                foreach (var p in permutationsP)
+                {
+                    permutation.Add(findFirstAndLast()[0]);
+                    permutation.AddRange(p);
+                    permutation.Add(findFirstAndLast()[1]);
+
+                    if (createEdgesAndFindMinFeedBack(permutation) < feedback)
+                    {
+                        feedback = createEdgesAndFindMinFeedBack(permutation);
+                        permutatiOptimal.AddRange(permutation);
+                    }
+                }
+                /////////////////////
+                outVModulsFrom(permutatiOptimal);
+                createEdgesAndFindMinFeedBack(permutatiOptimal);
+                _gArea.RelayoutGraph();
+            }
+        }
+        //private int findMinFeedBack(List<List<string>> list)
+        //{
+        //    int feedback = 0;
+        //    foreach (HashSet<string> row in calc.mas)
+        //    {
+        //        for (int i = 0; i < row.Count - 1; i++)
+        //        {
+        //            int indexV1 = list.FindIndex(x => x.Contains(row.ElementAt(i)));
+        //            int indexV2 = list.FindIndex(x => x.Contains(row.ElementAt(i + 1)));
+
+        //            if (indexV1 > indexV2)
+        //            {
+        //                string nameV1 = nameVertexAndM.First(x => x.Value.Contains(row.ElementAt(i))).Key;
+        //                string nameV2 = nameVertexAndM.First(x => x.Value.Contains(row.ElementAt(i + 1))).Key;
+
+        //                if (nameV1 != nameV2)
+        //                {
+        //                    var Edge = new DataEdge(totalGraph.Vertices.First(x => x.Text == nameV1), totalGraph.Vertices.First(x => x.Text == nameV2)) { Text = string.Format("{0} -> {1}", totalGraph.Vertices.First(x => x.Text == nameV1), totalGraph.Vertices.First(x => x.Text == nameV2)) };
+
+        //                    //Перевіряю чи є вже таке ребро
+        //                    DataEdge temp = new DataEdge();
+        //                    if (totalGraph.TryGetEdge(Edge.Source, Edge.Target, out temp) == false)
+        //                    {
+        //                        feedback++;                               
+        //                    }
+        //                }
+                        
+        //            }
+        //        }
+        //    }
+        //    return feedback;
+        //}
+
     }
 }
 

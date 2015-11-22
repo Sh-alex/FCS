@@ -29,3 +29,6 @@ D:\Google Диск\KPI\3 курс\1 семестр\ГКС\Лаби\Лаба1\Lab
 D:\Google Диск\KPI\3 курс\1 семестр\ГКС\курсач\FCS-master\Lab1\Lab1\bin\Debug\Lab1.exe.config
 D:\Google Диск\KPI\3 курс\1 семестр\ГКС\курсач\FCS-master\Lab1\Lab1\obj\Debug\Lab1.exe
 D:\Google Диск\KPI\3 курс\1 семестр\ГКС\курсач\FCS-master\Lab1\Lab1\obj\Debug\Lab1.pdb
+D:\Google Диск\KPI\3 курс\1 семестр\ГКС\Лаби\Лаба1\Lab1\Lab1\bin\Debug\Combinatorics.dll
+D:\Google Диск\KPI\3 курс\1 семестр\ГКС\Лаби\Лаба1\Lab1\Lab1\bin\Debug\Combinatorics.pdb
+D:\Google Диск\KPI\3 курс\1 семестр\ГКС\Лаби\Лаба1\Lab1\Lab1\bin\Debug\Combinatorics.xml

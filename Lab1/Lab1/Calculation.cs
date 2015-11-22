@@ -435,7 +435,7 @@ namespace Lab1
             }
         }       
 
-        ////////////////4 і 5 лаби в GraphVisualizer
+        ////////////////4, 5 і 6 лаби в GraphVisualizer
 
     }
 }
