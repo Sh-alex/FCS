@@ -18,7 +18,35 @@ namespace Lab1
         {
             InitializeComponent();
         }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            //numericRows.Value = 14;
+            //numericCols.Value = 7;
+            //button1_Click(sender, e);
+            //string line = "";
 
+            //System.IO.StreamReader file =
+            //    new System.IO.StreamReader("myVar.txt", Encoding.Default);
+            //int index = 0;
+            //while ((line = file.ReadLine()) != null)
+            //{
+            //    List<string> list = new List<string>();
+
+            //    for (int i = 0; i < line.Length - 1; i++)
+            //    {
+            //        list.Add(line.Substring(i, 2));
+            //        i++;
+            //    }
+
+            //    for(int i = 0; i < list.Count; i++)
+            //    {
+            //        valueEl[index][i].Text = list[i];
+            //    }
+            //    index++;
+            //}
+
+            //file.Close();
+        }
         private void clearEl()
         {
             Controls.Clear();
@@ -187,5 +215,7 @@ namespace Lab1
             ////////////////////////////////
             
         }
+
+        
     }
 }

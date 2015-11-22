@@ -101,7 +101,8 @@ namespace Lab1
                         var dataVertex1 = new DataVertex(calc.mas[calc.groupsAfterV[i].ElementAt(j)].ElementAt(t));
                         var dataVertex2 = new DataVertex(calc.mas[calc.groupsAfterV[i].ElementAt(j)].ElementAt(t + 1));
 
-                        var Edge = new DataEdge(vlist.Find(x => x.Text == dataVertex1.Text), vlist.Find(x => x.Text == dataVertex2.Text)) { Text = string.Format("{0} -> {1}", vlist.Find(x => x.Text == dataVertex1.Text), vlist.Find(x => x.Text == dataVertex2.Text)) };
+                        var Edge = new DataEdge(vlist.Find(x => x.Text == dataVertex1.Text), vlist.Find(x => x.Text == dataVertex2.Text)) 
+                        { Text = string.Format("{0} -> {1}", vlist.Find(x => x.Text == dataVertex1.Text), vlist.Find(x => x.Text == dataVertex2.Text)) };
 
                         //Перевіряю чи є вже таке ребро
                         DataEdge temp = new DataEdge();
@@ -142,8 +143,6 @@ namespace Lab1
                 }
                 nameVertexAndModuls.Add(nameVertexAndModul);
             }
-            //Test
-            //mergeVertex(graphs[0], 0, graphs[0].Vertices.First(), graphs[0].Vertices.Last());
             //Повна згортка графів          
             for (int i = 0; i < graphs.Count; i++)
             {
@@ -207,7 +206,7 @@ namespace Lab1
             //////////////////////////////
             allGraphs.Add(totalGraph);
             _gArea.GenerateGraph(true, true);//Перемальовую граф
-            _gArea.RelayoutGraph();
+            //_gArea.RelayoutGraph();
             currentGraph = allGraphs.Count - 1;//Поточний проміжний граф(повністю згорнутий)
         }
         private void createStepGraph(int i)//Записує проміжний граф(для покрокового перегляду)
@@ -356,16 +355,59 @@ namespace Lab1
                     DFScycle(V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text), endV, E, V, color, w, cycleNEW);
                     color[V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text)] = 1;
                 }
-                else if (color[V.FindIndex(0, V.Count, x => x.Text == E[w].Source.Text)] == 1 && V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text) == u)
+            }
+        }
+        private void DFScycleForFifth(int u, int endV, List<DataEdge> E, List<DataVertex> V, int[] color, int unavailableEdge, List<int> cycle, Graph graph)//Пошук в глибину(для 5 умови)
+        {
+            //если u == endV, то эту вершину перекрашивать не нужно, иначе мы в нее не вернемся, а вернуться необходимо
+            if (u != endV)
+                color[u] = 2;
+            else if (cycle.Count >= 2)
+            {
+                cycle.Reverse();
+                string s = cycle[0].ToString();
+                for (int i = 1; i < cycle.Count; i++)
+                    s += "-" + cycle[i].ToString();
+                ///////////////////////
+                List<DataVertex> list = new List<DataVertex>();//Додаю вершину в цикл
+                list.Add(V.ElementAt(cycle[0]));
+                for (int i = 1; i < cycle.Count - 1; i++)
+                    list.Add(V.ElementAt(cycle[i]));
+                ///////////////////////
+                bool flag = false; //есть ли палиндром для этого цикла графа в List<string> catalogCycles?
+                for (int i = 0; i < catalogCycles.Count; i++)
+                    if (catalogCycles[i].ToString() == s)
+                    {
+                        flag = true;
+                        break;
+                    }
+                if (!flag)
+                {
+                    cycle.Reverse();
+                    list = new List<DataVertex>();
+                    list.Add(V.ElementAt(cycle[0]));
+                    for (int i = 1; i < cycle.Count - 1; i++)
+                        list.Add(V.ElementAt(cycle[i]));
+                    catalogCycles.Add(list);
+                }
+                return;
+            }
+            for (int w = 0; w < E.Count; w++)
+            {
+                var q = graph.OutEdges(V[V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text)]);
+                if (w == unavailableEdge || (graph.InEdges(V[V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text)]).Count() > 1
+                    || graph.OutEdges(V[V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text)]).Count() > 1) && V.FindIndex(x => x.Text == E[w].Target.Text) != endV)
+                    
+                    continue;
+                if (color[V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text)] == 1 && V.FindIndex(0, V.Count, x => x.Text == E[w].Source.Text) == u)
                 {
                     List<int> cycleNEW = new List<int>(cycle);
-                    cycleNEW.Add(V.FindIndex(0, V.Count, x => x.Text == E[w].Source.Text));
-                    DFScycle(V.FindIndex(0, V.Count, x => x.Text == E[w].Source.Text), endV, E, V, color, w, cycleNEW);
-                    color[V.FindIndex(0, V.Count, x => x.Text == E[w].Source.Text)] = 1;
+                    cycleNEW.Add(V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text));
+                    DFScycleForFifth(V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text), endV, E, V, color, w, cycleNEW, graph);
+                    color[V.FindIndex(0, V.Count, x => x.Text == E[w].Target.Text)] = 1;
                 }
             }
         }
-
         private List<List<DataVertex>> fifthCondition(Graph graph)//Вершини, які мають інший шлях до сина
         {
             var V = graph.Vertices.ToList();
@@ -384,7 +426,7 @@ namespace Lab1
                     cycle.Add(i);
                     cycle.Add(endV);
 
-                    DFScycle(i, endV, E, V, color, -1, cycle);//Шукаю так само як в 4 умові але кінцевою вершиною є не початкова вершина, а її син
+                    DFScycleForFifth(i, endV, E, V, color, -1, cycle, graph);//Шукаю так само як в 4 умові але кінцевою вершиною є не початкова вершина, а її син
                     catalogCycles.RemoveAll(x => x.Count == 2);
                 }
             }
@@ -511,10 +553,11 @@ namespace Lab1
 
             graphs.Clear();
             totalGraph.Clear();
-
+            ///////////////////////////////
             Generate_Click(sender, e);
 
             createModuls();
+
             outModuls();
         }
        
@@ -544,19 +587,20 @@ namespace Lab1
 
         private void outModuls()
         {
-            label1.Text = "Модулі:\n";
+
+            textBox1.Text = "Модулі:\n";
             int n = 1;
-            label1.Text += "\n";
+            textBox1.Text += "\r\n";
             for (int i = 0; i < calc.moduls.Count; i++)
             {
                 foreach (List<string> list in calc.moduls[i])
                 {
-                    label1.Text += n + " модуль {  ";
+                    textBox1.Text += n + " модуль {  ";
                     foreach (string j in list)
                     {
-                        label1.Text += j + "  ";
+                        textBox1.Text += j + "  ";
                     }
-                    label1.Text += "}\n";
+                    textBox1.Text += "}\r\n";
                     n++;
 
                 }
@@ -590,11 +634,11 @@ namespace Lab1
             for (int i = 0; i < calc.moduls.Count; i++)
             {
                 foreach (List<string> list in calc.moduls[i])
-                {
+                {                 
                     calc.modulsAfterVerification.Add(list);
                 }
             }
-            calc.modulsAfterVerification = calc.modulsAfterVerification.Distinct().ToList();
+           
             calc.modulsAfterVerification.Sort((a, b) => a.Count - b.Count);//Сортую за кількістю елементів
             //Формую такі самі множини для перевірки підмножин
             List<HashSet<string>> setModuls = new List<HashSet<string>>();
@@ -617,8 +661,16 @@ namespace Lab1
                     {
                         calc.modulsAfterVerification.RemoveAt(i);
                         setModuls.RemoveAt(i);
-                        totalGraph.RemoveVertex(totalGraph.Vertices.First(x => x.Text == nameVertexAndM.ElementAt(i).Key));
-                        nameVertexAndM.Remove(nameVertexAndM.ElementAt(i).Key);
+                        //////
+                        string temp = "";
+                        foreach(string str in setModuls[i])
+                        {
+                            temp += str;
+                        }
+                        /////
+
+                        totalGraph.RemoveVertex(totalGraph.Vertices.First(x => x.Text == temp));
+                        nameVertexAndM.Remove(temp);
                         i--;
                         break;
                     }
@@ -634,7 +686,12 @@ namespace Lab1
                         if (calc.modulsAfterVerification[k].Contains(calc.modulsAfterVerification[i][j]))
                         {
                             if (k == i) continue;
-                            calc.modulsAfterVerification[k].Remove(calc.modulsAfterVerification[i][j]);
+                            ///////////////////
+                            if (calc.modulsAfterVerification[k].Count >= calc.modulsAfterVerification[i].Count)
+                                calc.modulsAfterVerification[k].Remove(calc.modulsAfterVerification[i][j]);
+                            else
+                                calc.modulsAfterVerification[i].Remove(calc.modulsAfterVerification[i][j]);
+                            ///////////////////
                             if (calc.modulsAfterVerification[i].Count == 0) calc.modulsAfterVerification.RemoveAt(i);
                             //////
                             string namev = "";
@@ -661,18 +718,18 @@ namespace Lab1
         
         private void outVModuls()
         {
-            label2.Text = "Уточнені модулі:\n";
+            textBox2.Text = "Уточнені модулі:\n";
             int n = 1;
-            label2.Text += "\n";
+            textBox2.Text += "\r\n";
 
             foreach (List<string> list in calc.modulsAfterVerification)
             {
-                label2.Text += n + " модуль {  ";
+                textBox2.Text += n + " модуль {  ";
                 foreach (string j in list)
                 {
-                    label2.Text += j + "  ";
+                    textBox2.Text += j + "  ";
                 }
-                label2.Text += "}\n";
+                textBox2.Text += "}\r\n";
                 n++;
 
             }

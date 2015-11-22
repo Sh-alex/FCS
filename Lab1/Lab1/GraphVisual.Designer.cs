@@ -37,6 +37,8 @@
             this.backG = new System.Windows.Forms.Button();
             this.nextG = new System.Windows.Forms.Button();
             this.modulsV = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // wpfHost
@@ -46,7 +48,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.wpfHost.Location = new System.Drawing.Point(2, 1);
             this.wpfHost.Name = "wpfHost";
-            this.wpfHost.Size = new System.Drawing.Size(728, 450);
+            this.wpfHost.Size = new System.Drawing.Size(705, 481);
             this.wpfHost.TabIndex = 0;
             this.wpfHost.Text = "elementHost1";
             this.wpfHost.Child = null;
@@ -56,15 +58,15 @@
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.Location = new System.Drawing.Point(736, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(206, 198);
+            this.label1.Size = new System.Drawing.Size(206, 237);
             this.label1.TabIndex = 1;
             // 
             // label2
             // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.Location = new System.Drawing.Point(736, 220);
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label2.Location = new System.Drawing.Point(736, 265);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(206, 231);
+            this.label2.Size = new System.Drawing.Size(206, 202);
             this.label2.TabIndex = 2;
             // 
             // Generate
@@ -133,11 +135,31 @@
             this.modulsV.UseVisualStyleBackColor = true;
             this.modulsV.Click += new System.EventHandler(this.modulsV_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(713, 12);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox1.Size = new System.Drawing.Size(229, 215);
+            this.textBox1.TabIndex = 9;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(713, 229);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox2.Size = new System.Drawing.Size(229, 238);
+            this.textBox2.TabIndex = 10;
+            // 
             // GraphVisual
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1044, 451);
+            this.ClientSize = new System.Drawing.Size(1044, 482);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.modulsV);
             this.Controls.Add(this.nextG);
             this.Controls.Add(this.backG);
@@ -151,6 +173,7 @@
             this.Text = "GraphVisual";
             this.Load += new System.EventHandler(this.GraphVisual_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -165,5 +188,7 @@
         private System.Windows.Forms.Button backG;
         private System.Windows.Forms.Button nextG;
         private System.Windows.Forms.Button modulsV;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }
