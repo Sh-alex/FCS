@@ -783,6 +783,7 @@ namespace Lab1
                     elementFirst = el;
                 }
             }
+            List<string> first = calc.modulsAfterVerification.Find(x => x.Contains(elementFirst));
             /////////////////////////////////////////
             listEl.Clear();
             for (int i = 0; i < calc.mas.Count; i++ )//Записую останні елементи кожного модуля
@@ -795,17 +796,16 @@ namespace Lab1
             foreach (string el in listEl)
             {
 
-                if (listEl.FindAll(x => x == el).Count > elCount)
+                if (listEl.FindAll(x => x == el).Count > elCount && first.Contains(el) == false)
                 {
                     elCount = listEl.FindAll(x => x == el).Count;
                     elementLast = el;
                 }
             }
+
+            List<string> last = calc.modulsAfterVerification.Find(x => x.Contains(elementLast));
            /////////////////////
             
-            List<string> first = calc.modulsAfterVerification.Find(x => x.Contains(elementFirst));
-            List<string> last = calc.modulsAfterVerification.Find(x => x.Contains(elementLast));
-
             List<List<string>> result = new List<List<string>>();
             result.Add(first);
             result.Add(last);
@@ -854,7 +854,7 @@ namespace Lab1
             ///////////
             totalGraph.RemoveEdgeIf(x => x.Text != "");
             totalGraph.RemoveVertexIf(x => x.Text != "");
-
+            ///////////////
             for (int i = list.Count - 1; i >= 0; i--)
             {
                 string str = "";
@@ -933,12 +933,14 @@ namespace Lab1
                     if (createEdgesAndFindMinFeedBack(permutation) < feedback)
                     {
                         feedback = createEdgesAndFindMinFeedBack(permutation);
+                        permutatiOptimal.Clear();
                         permutatiOptimal.AddRange(permutation);
                     }
+                    permutation.Clear();
                 }
                 /////////////////////
-                outVModulsFrom(permutatiOptimal);
                 createEdgesAndFindMinFeedBack(permutatiOptimal);
+                outVModulsFrom(permutatiOptimal);
                 _gArea.RelayoutGraph();
             }
         }
