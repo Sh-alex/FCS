@@ -828,6 +828,7 @@ namespace Lab1
             createEdgesAndFindMinFeedBack(firstOrder);
             //Виводжу результати створення зв'язків і уточнені модулі з першою та останньою групою
             outVModulsFrom(firstOrder);
+            textBox2.Text += "\r\nКількість зворотніх зв'язків: " + createEdgesAndFindMinFeedBack(firstOrder);
             _gArea.GenerateGraph(true, true);//Перемальовую граф
         }
         private void outVModulsFrom(List<List<string>> source)
@@ -913,8 +914,8 @@ namespace Lab1
 
                 List<List<string>> temp = new List<List<string>>();
                 temp.AddRange(calc.modulsAfterVerification);
-                temp.Remove(findFirstAndLast()[0]);
-                temp.Remove(findFirstAndLast()[1]);
+                //temp.Remove(findFirstAndLast()[0]);
+                //temp.Remove(findFirstAndLast()[1]);
 
                 //Всі перестановки
                 var permutationsP = new Variations<List<string>>(temp, temp.Count);//Всі перестановки
@@ -926,9 +927,9 @@ namespace Lab1
 
                 foreach (var p in permutationsP)
                 {
-                    permutation.Add(findFirstAndLast()[0]);
+                    //permutation.Add(findFirstAndLast()[0]);
                     permutation.AddRange(p);
-                    permutation.Add(findFirstAndLast()[1]);
+                    //permutation.Add(findFirstAndLast()[1]);
 
                     if (createEdgesAndFindMinFeedBack(permutation) < feedback)
                     {
@@ -941,6 +942,7 @@ namespace Lab1
                 /////////////////////
                 createEdgesAndFindMinFeedBack(permutatiOptimal);
                 outVModulsFrom(permutatiOptimal);
+                textBox2.Text += "\r\nКількість зворотніх зв'язків: " + feedback;
                 _gArea.RelayoutGraph();
             }
         }
