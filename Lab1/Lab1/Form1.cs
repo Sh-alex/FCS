@@ -21,7 +21,7 @@ namespace Lab1
         private void Form1_Load(object sender, EventArgs e)
         {
             numericRows.Value = 14;
-            numericCols.Value = 7;
+            numericCols.Value = 8;
             button1_Click(sender, e);
             string line = "";
 

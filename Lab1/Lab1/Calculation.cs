@@ -11,9 +11,6 @@ namespace Lab1
 {
     public class Calculation
     {
-
-        
-
         public List<HashSet<string>> mas;//Масив елементів
 
 
@@ -154,28 +151,36 @@ namespace Lab1
                 groups.Add(new HashSet<int>());//Створюю нову групу
                 groups.ElementAt(currentGroup).Add(maxElIndex[0]);//Записую в групу індекси максимального елемента (i)
                 groups.ElementAt(currentGroup).Add(maxElIndex[1]);//(j)
-                int i = maxElIndex[0];
-                for (int j = 0; j < resultMatrix.Count; j++)//Продивляюсь по рядку(i=const)
-                {
-                    if (i == j) break;
-                    if (resultMatrix[i][j] == resultMatrix[maxElIndex[0]][maxElIndex[1]] && containedInGroups(j) == false)
-                    {
-                        groups.ElementAt(currentGroup).Add(j);
-                    }
-                }
-                int x = maxElIndex[1];
-                for (int k = 0; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
-                {
-                    if (resultMatrix[k][x] == resultMatrix[maxElIndex[0]][maxElIndex[1]] && containedInGroups(k) == false)
-                    {
-                        groups.ElementAt(currentGroup).Add(k);
-                    }
-                }
+
+                createGroupsNext(currentGroup, maxElIndex[0], maxElIndex[1]);
+                
                 currentGroup++;
             } while (containsAllIndex() == false); 
 
         }
-
+        private void createGroupsNext(int currentGroup, int maxElIndex0, int maxElIndex1)//Пошук таких самих елементів по рядках і стовпцях
+        {
+            
+            int i = maxElIndex0;
+            for (int j = 0; j < resultMatrix.Count; j++)//Продивляюсь по рядку(i=const)
+            {
+                //if (i == j) break;
+                if (resultMatrix[i][j] == resultMatrix[maxElIndex0][maxElIndex1] && containedInGroups(j) == false)
+                {
+                    groups.ElementAt(currentGroup).Add(j);
+                    createGroupsNext(currentGroup, i, j);
+                }
+            }
+            int x = maxElIndex1;
+            for (int k = 0; k < resultMatrix.Count; k++)//Продивляюсь по стовпцю(j=const)
+            {
+                if (resultMatrix[k][x] == resultMatrix[maxElIndex0][maxElIndex1] && containedInGroups(k) == false)
+                {
+                    groups.ElementAt(currentGroup).Add(k);
+                    createGroupsNext(currentGroup, k, x);
+                }
+            }
+        }
         private int[] maxEl(int matrixSize, List<List<int>> resultMatrix)//Пошук максимального елемента, який ще не має групи
         {
             int max = -1;

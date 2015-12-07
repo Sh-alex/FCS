@@ -102,9 +102,9 @@
             // lResult
             // 
             this.lResult.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lResult.Location = new System.Drawing.Point(503, 13);
+            this.lResult.Location = new System.Drawing.Point(488, 13);
             this.lResult.Name = "lResult";
-            this.lResult.Size = new System.Drawing.Size(365, 406);
+            this.lResult.Size = new System.Drawing.Size(380, 406);
             this.lResult.TabIndex = 4;
             // 
             // lNumberCols
