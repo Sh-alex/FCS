@@ -419,7 +419,7 @@ namespace Lab1
                 {
                     for (int j = i+1; j < tempSet.Count; j++)
                     {
-                        if(numberOverlapped[i] < numberOverlapped[j])
+                        if(numberOverlapped[i] > numberOverlapped[j])
                         {
                             int temp = numberOverlapped[i];
                             numberOverlapped[i] = numberOverlapped[j];
